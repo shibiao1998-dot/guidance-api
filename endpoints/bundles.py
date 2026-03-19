@@ -1,7 +1,7 @@
 """Bundle 端点 - 材料包管理"""
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 import models
 import schemas
@@ -16,7 +16,9 @@ def create_bundle(bundle: schemas.BundleCreate, db: Session = Depends(get_db)):
     db_bundle = models.Bundle(
         name=bundle.name,
         description=bundle.description,
-        metadata_json=bundle.metadata_json
+        metadata_json=bundle.metadata_json,
+        user_id=bundle.user_id,
+        session_id=bundle.session_id
     )
     db.add(db_bundle)
     db.commit()
@@ -34,9 +36,20 @@ def get_bundle(bundle_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=List[schemas.BundleResponse], summary="获取材料包列表")
-def list_bundles(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    """获取材料包列表"""
-    bundles = db.query(models.Bundle).offset(skip).limit(limit).all()
+def list_bundles(
+    skip: int = 0,
+    limit: int = 100,
+    user_id: Optional[str] = Query(None, description="用户 ID 筛选"),
+    session_id: Optional[str] = Query(None, description="会话 ID 筛选"),
+    db: Session = Depends(get_db)
+):
+    """获取材料包列表，支持按用户/会话筛选"""
+    query = db.query(models.Bundle)
+    if user_id:
+        query = query.filter(models.Bundle.user_id == user_id)
+    if session_id:
+        query = query.filter(models.Bundle.session_id == session_id)
+    bundles = query.offset(skip).limit(limit).all()
     return bundles
 
 

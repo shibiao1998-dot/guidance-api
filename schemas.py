@@ -17,6 +17,9 @@ class BundleBase(BaseModel):
     name: str = Field(..., description="材料包名称")
     description: Optional[str] = Field(None, description="描述")
     metadata_json: Optional[Dict[str, Any]] = Field(None, description="元数据")
+    # 多租户隔离字段
+    user_id: Optional[str] = Field(None, description="用户 ID")
+    session_id: Optional[str] = Field(None, description="会话 ID")
 
 
 class BundleCreate(BundleBase):
@@ -44,6 +47,9 @@ class EvidenceCardBase(BaseModel):
     source_type: Optional[str] = Field("material", description="来源类型")
     source_ref: Optional[str] = Field(None, description="来源引用")
     tags: Optional[List[str]] = Field(None, description="标签列表")
+    # 多租户隔离字段
+    user_id: Optional[str] = Field(None, description="用户 ID")
+    session_id: Optional[str] = Field(None, description="会话 ID")
 
 
 class EvidenceCardCreate(EvidenceCardBase):
@@ -65,6 +71,9 @@ class GlossaryTermBase(BaseModel):
     definition: str = Field(..., description="定义")
     category: Optional[str] = Field(None, description="分类")
     version: Optional[str] = Field("1.0.0", description="版本号")
+    # 多租户隔离字段
+    user_id: Optional[str] = Field(None, description="用户 ID")
+    session_id: Optional[str] = Field(None, description="会话 ID")
 
 
 class GlossaryTermCreate(GlossaryTermBase):
@@ -93,6 +102,9 @@ class DirectionBase(BaseModel):
     rationale: Optional[str] = Field(None, description="制定理由")
     sort_order: Optional[int] = Field(0, description="排序顺序")
     version: Optional[str] = Field("1.0.0", description="版本号")
+    # 多租户隔离字段
+    user_id: Optional[str] = Field(None, description="用户 ID")
+    session_id: Optional[str] = Field(None, description="会话 ID")
 
 
 class DirectionCreate(DirectionBase):
@@ -123,6 +135,9 @@ class DimensionBase(BaseModel):
     key_points: Optional[List[str]] = Field(None, description="关键点列表")
     sort_order: Optional[int] = Field(0, description="排序顺序")
     version: Optional[str] = Field("1.0.0", description="版本号")
+    # 多租户隔离字段
+    user_id: Optional[str] = Field(None, description="用户 ID")
+    session_id: Optional[str] = Field(None, description="会话 ID")
 
 
 class DimensionCreate(DimensionBase):
@@ -154,6 +169,9 @@ class OpinionBase(BaseModel):
     evidence_refs: Optional[List[int]] = Field(None, description="证据引用 ID 列表")
     sort_order: Optional[int] = Field(0, description="排序顺序")
     version: Optional[str] = Field("1.0.0", description="版本号")
+    # 多租户隔离字段
+    user_id: Optional[str] = Field(None, description="用户 ID")
+    session_id: Optional[str] = Field(None, description="会话 ID")
 
 
 class OpinionCreate(OpinionBase):
@@ -184,6 +202,9 @@ class ReviewQueueBase(BaseModel):
     item_id: int = Field(..., description="项目 ID")
     action: str = Field(..., description="操作类型：create/update/delete")
     payload: Dict[str, Any] = Field(..., description="变更内容")
+    # 多租户隔离字段
+    user_id: Optional[str] = Field(None, description="用户 ID")
+    session_id: Optional[str] = Field(None, description="会话 ID")
 
 
 class ReviewQueueCreate(ReviewQueueBase):
@@ -215,6 +236,9 @@ class SnapshotBase(BaseModel):
     guidance_contract: Dict[str, Any] = Field(..., description="结构化合同 JSON")
     change_log: Optional[str] = Field(None, description="变更日志")
     created_by: Optional[str] = Field(None, description="创建人")
+    # 多租户隔离字段
+    user_id: Optional[str] = Field(None, description="用户 ID")
+    session_id: Optional[str] = Field(None, description="会话 ID")
 
 
 class SnapshotCreate(SnapshotBase):

@@ -32,6 +32,9 @@ class Bundle(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     metadata_json = Column(JSON, nullable=True)  # 额外元数据
+    # 多租户隔离字段
+    user_id = Column(String, index=True, nullable=True)  # 用户 ID
+    session_id = Column(String, index=True, nullable=True)  # 会话 ID
 
     # 关联证据卡
     evidence_cards = relationship("EvidenceCard", back_populates="bundle", cascade="all, delete-orphan")
@@ -48,6 +51,9 @@ class EvidenceCard(Base):
     source_ref = Column(String, nullable=True)  # 来源引用（如页码、段落号）
     tags = Column(JSON, nullable=True)  # 标签列表
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    # 多租户隔离字段（冗余存储，便于独立查询）
+    user_id = Column(String, index=True, nullable=True)  # 用户 ID
+    session_id = Column(String, index=True, nullable=True)  # 会话 ID
 
     # 关联材料包
     bundle = relationship("Bundle", back_populates="evidence_cards")
@@ -64,6 +70,9 @@ class GlossaryTerm(Base):
     version = Column(String, default="1.0.0")  # 版本号
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    # 多租户隔离字段
+    user_id = Column(String, index=True, nullable=True)  # 用户 ID
+    session_id = Column(String, index=True, nullable=True)  # 会话 ID
 
 
 class Direction(Base):
@@ -78,6 +87,9 @@ class Direction(Base):
     version = Column(String, default="1.0.0")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    # 多租户隔离字段
+    user_id = Column(String, index=True, nullable=True)  # 用户 ID
+    session_id = Column(String, index=True, nullable=True)  # 会话 ID
 
     # 关联维度
     dimensions = relationship("Dimension", back_populates="direction", cascade="all, delete-orphan")
@@ -96,6 +108,9 @@ class Dimension(Base):
     version = Column(String, default="1.0.0")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    # 多租户隔离字段（冗余存储，便于独立查询）
+    user_id = Column(String, index=True, nullable=True)  # 用户 ID
+    session_id = Column(String, index=True, nullable=True)  # 会话 ID
 
     # 关联方向
     direction = relationship("Direction", back_populates="dimensions")
@@ -116,6 +131,9 @@ class Opinion(Base):
     version = Column(String, default="1.0.0")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    # 多租户隔离字段（冗余存储，便于独立查询）
+    user_id = Column(String, index=True, nullable=True)  # 用户 ID
+    session_id = Column(String, index=True, nullable=True)  # 会话 ID
 
     # 关联维度
     dimension = relationship("Dimension", back_populates="opinions")
@@ -135,6 +153,9 @@ class ReviewQueue(Base):
     comment = Column(Text, nullable=True)  # 审核意见
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    # 多租户隔离字段
+    user_id = Column(String, index=True, nullable=True)  # 用户 ID
+    session_id = Column(String, index=True, nullable=True)  # 会话 ID
 
 
 class Snapshot(Base):
@@ -149,6 +170,9 @@ class Snapshot(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     created_by = Column(String, nullable=True)
     is_published = Column(Integer, default=0)  # 是否已发布
+    # 多租户隔离字段
+    user_id = Column(String, index=True, nullable=True)  # 用户 ID
+    session_id = Column(String, index=True, nullable=True)  # 会话 ID
 
 
 class PublishLog(Base):

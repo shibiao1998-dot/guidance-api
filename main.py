@@ -30,6 +30,10 @@ load_dotenv()
 # 创建数据库表
 Base.metadata.create_all(bind=engine)
 
+# 运行数据库迁移（添加多租户字段）
+from auto_migrate import run_migration
+run_migration(engine)
+
 # 创建 FastAPI 应用
 app = FastAPI(
     title="Guidance API",

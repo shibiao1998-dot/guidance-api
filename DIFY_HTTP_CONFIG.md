@@ -10,18 +10,11 @@
 
 | 变量名 | 类型 | 默认值 | 说明 |
 |--------|------|--------|------|
-| `base_url` | String | `https://pink-camels-notice.loca.lt` | Guidance API 的 Base URL |
+| `base_url` | String | `https://guidance-api-production.up.railway.app` | Guidance API 的 Base URL |
 
 **之后所有 HTTP Request 节点的 URL 都使用 `{{#base_url#}}/端点路径` 格式**
 
-这样当 localtunnel URL 变更时，只需修改变量默认值，不需要修改每个节点！
-
----
-
-**通用 Headers:**
-```
-Content-Type: application/json
-```
+这样当 URL 变更时，只需修改变量默认值，不需要修改每个节点！
 
 ---
 
@@ -29,10 +22,13 @@ Content-Type: application/json
 
 | 状态 | URL | 更新时间 |
 |------|-----|----------|
-| ✅ 当前可用 | `https://pink-camels-notice.loca.lt` | 2026-03-19 |
-| ❌ 已失效 | `https://lemon-kids-write.loca.lt` | - |
-| ❌ 已失效 | `https://solid-planets-camp.loca.lt` | - |
-| ❌ 已失效 | `https://nine-shoes-wash.loca.lt` | - |
+| ✅ 生产环境 | `https://guidance-api-production.up.railway.app` | 2026-03-19 |
+
+> 🎉 **Railway 部署完成** - 这是固定域名，永久有效！
+
+---
+
+**通用 Headers:**
 
 > ⚠️ **注意**：localtunnel 每次重启会生成新 URL，请在 Dify 变量中更新 `base_url` 为最新值
 
