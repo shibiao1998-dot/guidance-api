@@ -21,7 +21,8 @@ from endpoints import (
     review_queue,
     snapshots,
     publish,
-    guidance
+    guidance,
+    admin
 )
 
 # 加载环境变量
@@ -71,6 +72,7 @@ app.include_router(review_queue.router)
 app.include_router(snapshots.router)
 app.include_router(publish.router)
 app.include_router(guidance.router)
+app.include_router(admin.router)
 
 
 if __name__ == "__main__":
