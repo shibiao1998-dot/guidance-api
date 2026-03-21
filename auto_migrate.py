@@ -18,6 +18,12 @@ TABLES_WITH_TENANT_FIELDS = [
     "snapshots",
 ]
 
+# 需要添加 identity_tags 字段的表
+TABLES_WITH_IDENTITY_TAGS = [
+    "dimensions",
+    "opinions",
+]
+
 def column_exists(inspector, table_name, column_name):
     """检查列是否已存在"""
     try:
@@ -44,6 +50,17 @@ def run_migration(engine):
                             conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} VARCHAR(255)"))
                         conn.commit()
                     logger.info(f"Added column {table}.{column}")
+
+        # 添加 identity_tags 字段（JSONB 类型）
+        for table in TABLES_WITH_IDENTITY_TAGS:
+            if not column_exists(inspector, table, "identity_tags"):
+                with engine.connect() as conn:
+                    if is_postgres:
+                        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN identity_tags JSONB DEFAULT '[]'::jsonb"))
+                    else:
+                        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN identity_tags JSON"))
+                    conn.commit()
+                logger.info(f"Added column {table}.identity_tags")
 
         logger.info("Database migration completed")
     except Exception as e:
