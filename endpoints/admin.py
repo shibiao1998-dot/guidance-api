@@ -1,11 +1,11 @@
 """管理端点 - 数据库管理操作"""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 import logging
 
 import models
-from database import get_db
+from database import get_db, engine
 
 logger = logging.getLogger(__name__)
 
@@ -124,3 +124,43 @@ def get_stats(db: Session = Depends(get_db)):
         "review_queue": db.query(models.ReviewQueue).count(),
         "snapshots": db.query(models.Snapshot).count(),
     }
+
+
+@router.post("/migrate", summary="执行数据库迁移")
+def run_migration_endpoint(db: Session = Depends(get_db)):
+    """
+    手动触发数据库迁移（添加 identity_tags 字段）
+
+    用于在应用启动时自动迁移失败时手动执行
+    """
+    try:
+        inspector = inspect(engine)
+        is_postgres = not str(engine.url).startswith('sqlite')
+
+        results = {"migrated": [], "skipped": [], "errors": []}
+
+        # 为 dimensions 和 opinions 表添加 identity_tags 字段
+        for table in ["dimensions", "opinions"]:
+            try:
+                columns = [col['name'] for col in inspector.get_columns(table)]
+                if "identity_tags" in columns:
+                    results["skipped"].append(f"{table}.identity_tags 已存在")
+                else:
+                    with engine.connect() as conn:
+                        if is_postgres:
+                            conn.execute(text(f"ALTER TABLE {table} ADD COLUMN identity_tags JSONB DEFAULT '[]'::jsonb"))
+                        else:
+                            conn.execute(text(f"ALTER TABLE {table} ADD COLUMN identity_tags JSON"))
+                        conn.commit()
+                    results["migrated"].append(f"{table}.identity_tags 已添加")
+            except Exception as e:
+                results["errors"].append(f"{table}: {str(e)}")
+
+        return {
+            "status": "success",
+            "message": "迁移完成",
+            "details": results
+        }
+    except Exception as e:
+        logger.error(f"迁移失败：{e}")
+        raise HTTPException(status_code=500, detail=f"迁移失败：{str(e)}")
