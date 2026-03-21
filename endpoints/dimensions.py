@@ -24,7 +24,8 @@ def create_dimension(dimension: schemas.DimensionCreate, db: Session = Depends(g
         description=dimension.description,
         key_points=dimension.key_points,
         sort_order=dimension.sort_order,
-        version=dimension.version
+        version=dimension.version,
+        identity_tags=dimension.identity_tags or []
     )
     db.add(db_dimension)
     db.commit()

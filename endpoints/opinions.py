@@ -18,13 +18,19 @@ def create_opinion(opinion: schemas.OpinionCreate, db: Session = Depends(get_db)
     if not dimension:
         raise HTTPException(status_code=404, detail="Dimension not found")
 
+    # 将 evidence_refs 对象转换为字典存储
+    evidence_refs_dict = None
+    if opinion.evidence_refs:
+        evidence_refs_dict = opinion.evidence_refs.model_dump()
+
     db_opinion = models.Opinion(
         dimension_id=opinion.dimension_id,
         content=opinion.content,
         reasoning=opinion.reasoning,
-        evidence_refs=opinion.evidence_refs,
+        evidence_refs=evidence_refs_dict,
         sort_order=opinion.sort_order,
-        version=opinion.version
+        version=opinion.version,
+        identity_tags=opinion.identity_tags or []
     )
     db.add(db_opinion)
     db.commit()

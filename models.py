@@ -106,6 +106,7 @@ class Dimension(Base):
     key_points = Column(JSON, nullable=True)  # 关键点列表
     sort_order = Column(Integer, default=0)
     version = Column(String, default="1.0.0")
+    identity_tags = Column(JSON, nullable=True, default=list)  # 三重身份标签：platform, ecosystem, organization
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # 多租户隔离字段（冗余存储，便于独立查询）
@@ -126,9 +127,10 @@ class Opinion(Base):
     dimension_id = Column(Integer, ForeignKey("dimensions.id"), nullable=False)
     content = Column(Text, nullable=False)  # 观点内容
     reasoning = Column(Text, nullable=True)  # 推理依据
-    evidence_refs = Column(JSON, nullable=True)  # 证据引用 ID 列表
+    evidence_refs = Column(JSON, nullable=True)  # 证据引用（包含 opinion_type, tech_mode, confidence 等）
     sort_order = Column(Integer, default=0)
     version = Column(String, default="1.0.0")
+    identity_tags = Column(JSON, nullable=True, default=list)  # 三重身份标签：platform, ecosystem, organization
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # 多租户隔离字段（冗余存储，便于独立查询）

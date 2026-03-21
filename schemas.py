@@ -135,6 +135,7 @@ class DimensionBase(BaseModel):
     key_points: Optional[List[str]] = Field(None, description="关键点列表")
     sort_order: Optional[int] = Field(0, description="排序顺序")
     version: Optional[str] = Field("1.0.0", description="版本号")
+    identity_tags: Optional[List[str]] = Field(default_factory=list, description="三重身份标签：platform, ecosystem, organization")
     # 多租户隔离字段
     user_id: Optional[str] = Field(None, description="用户 ID")
     session_id: Optional[str] = Field(None, description="会话 ID")
@@ -163,12 +164,23 @@ class DimensionResponse(DimensionBase):
 
 
 # ==================== Opinion ====================
+class EvidenceRefs(BaseModel):
+    """观点证据引用结构"""
+    opinion_type: str = Field(..., description="观点类型：goal|method|rule_positive|rule_negative|applied")
+    tech_mode: Optional[str] = Field("na", description="技术模式：self_build|applied|na")
+    confidence: Optional[str] = Field("high", description="置信度：high|moderate|low")
+    source_type: Optional[str] = Field("material_extracted", description="来源类型：material_extracted|expert_supplemented")
+    suggestion_source: Optional[str] = Field("na", description="AI 补充来源：internal_inference|external_knowledge|na")
+    expected_action: Optional[str] = Field("na", description="期望动作：confirm|modify|supplement|ignore|na")
+
+
 class OpinionBase(BaseModel):
     content: str = Field(..., description="观点内容")
     reasoning: Optional[str] = Field(None, description="推理依据")
-    evidence_refs: Optional[List[int]] = Field(None, description="证据引用 ID 列表")
+    evidence_refs: Optional[EvidenceRefs] = Field(None, description="证据引用对象")
     sort_order: Optional[int] = Field(0, description="排序顺序")
     version: Optional[str] = Field("1.0.0", description="版本号")
+    identity_tags: Optional[List[str]] = Field(default_factory=list, description="三重身份标签：platform, ecosystem, organization")
     # 多租户隔离字段
     user_id: Optional[str] = Field(None, description="用户 ID")
     session_id: Optional[str] = Field(None, description="会话 ID")
@@ -275,9 +287,34 @@ class PublishResponse(BaseModel):
 
 # ==================== Guidance (完整文档) ====================
 class GuidanceDocument(BaseModel):
-    """完整的指导文档结构"""
-    directions: List[DirectionResponse] = []
-    dimensions: List[DimensionResponse] = []
+    """完整的指导文档结构（树状嵌套）"""
+    directions: List["DirectionWithChildren"] = []
+
+
+class DirectionWithChildren(BaseModel):
+    """方向及其子维度和观点"""
+    id: int
+    name: str
+    description: str
+    rationale: Optional[str] = None
+    sort_order: Optional[int] = 0
+    version: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    dimensions: List["DimensionWithOpinions"] = []
+
+
+class DimensionWithOpinions(BaseModel):
+    """维度及其子观点"""
+    id: int
+    name: str
+    description: str
+    key_points: Optional[List[str]] = None
+    sort_order: Optional[int] = 0
+    version: Optional[str] = None
+    identity_tags: Optional[List[str]] = []
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     opinions: List[OpinionResponse] = []
 
 
